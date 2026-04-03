@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="termin.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet"> 
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+    <script>
+    (function(){
+    emailjs.init("vw48c231i3xZhrH6j");
+    })();
+    </script>
+    <title>Document</title>
+</head>
+<body>
+   <main>
+    <div class="termien-console">
+        <div class="termien-layout">
+            <div>
+                <img src="termin-img.jpg" alt="" class="termin-img">
+            </div>
+            <div class="data">
+                <div>
+                    <h1>Jetzt Termien Auswählen</h1>
+                </div>
+                <div>
+                    <input type="text" id="name" placeholder="Name" required>
+                    <input type="text" id="phone" placeholder="Telefonnummer" required>
+                    <input type="email" id="email" placeholder="Email" required>
+                </div>
+                <div>
+                    <label for="Dienstleisung">Wähle die gewünschte Dienstleistung aus</label>
+                    <select id="service">
+                        <option value="Haare">Haare</option>
+                        <option value="Bart">Bart</option>
+                        <option value="Färben">Färben</option>
+                        <option value="Sonstiges">Sonstiges</option>
+                    </select>
+                </div>
+                <div class="gender">
+                    <label class="gender-label"><input type="radio" name="gender" value="Männlich" class="choices">Männlich</label>
+                    <label class="gender-label"><input type="radio" name="gender" value="Weiblich" class="choices">Weiblich</label>
+                    <label class="gender-label"><input type="radio" name="gender" value="Divers" class="choices">Divers</label>
+                </div>
+                <div>
+                    <label for="date">Datum wählen:</label><br>
+                    <input type="date" id="date">
+                    <script>
+                    flatpickr("#calendar", {
+                        dateFormat: "d.m.Y"
+                    });
+                    </script>
+                    <h3>Uhrzeit wählen:</h3>
+                    <div id="times"></div>
+                    
+                </div>
+                <div>
+                    <button onclick="sendEmail()">Senden</button>
+                </div>
+                <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+                <script>
+                (function(){
+                emailjs.init("vw48c231i3xZhrH6j");
+                })();
+
+                function sendEmail() {
+
+                const name = document.getElementById("name").value;
+                const phone = document.getElementById("phone").value;
+                const email = document.getElementById("email").value;
+                const service = document.getElementById("service").value;
+                const genderEl = document.querySelector('input[name="gender"]:checked');
+
+                // ❗ Check zuerst
+                if (!name || !phone || !email || !service || !genderEl || !selectedDate || !selectedTime) {
+                    alert("Bitte alles ausfüllen!");
+                    return;
+                }
+
+                const templateParams = {
+                    name: name,
+                    phone: phone,
+                    email: email,
+                    service: service,
+                    gender: genderEl.value,
+                    date: selectedDate,
+                    time: selectedTime
+                };
+
+                // ✅ JETZT richtig in der Funktion
+                emailjs.send(
+                "service_iomg81r",
+                "template_zcimchr",
+                templateParams,
+                "vw48c231i3xZhrH6j" // 👈 PUBLIC KEY HIER!
+                )   .then(() => {
+                      // 🔥 Termine speichern
+                    let bookings = JSON.parse(localStorage.getItem("bookings")) || {};
+                    if (!bookings[selectedDate]) {
+                        bookings[selectedDate] = [];
+                    }
+                    bookings[selectedDate].push(selectedTime);
+                    localStorage.setItem("bookings", JSON.stringify(bookings));
+                    alert("Termin wurde gebucht, wir freuen uns auf Sie.");
+                    renderTimes(); // 🔥 neu laden (wichtig!)
+                    })
+                    .catch((error) => {
+                    console.log(error);
+                    alert("Fehler!");
+                    });
+
+                }
+                </script>
+                <div id="result"></div>
+            </div>
+        </div> 
+    </div> 
+   </main>
+    <script src="termien.js"></script>
+</body>
+</html>
